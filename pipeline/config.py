@@ -22,7 +22,7 @@ CITIES = [
 
 # FRED API
 FRED_BASE = "https://api.stlouisfed.org/fred/series/observations"
-FRED_API_KEY = ""  # 填入 FRED API key（免费注册：https://fred.stlouisfed.org/docs/api/api_key.html）
+FRED_API_KEY = "f601a37366c8923ba92f029eb29bb026"
 
 # ExchangeRate-API（备用）
 FX_BASE = "https://v6.exchangerate-api.com/v6"
