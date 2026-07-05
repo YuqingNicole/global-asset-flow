@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Asset Flow — 全球资产流向</title>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #161920;
+      --surface2: #1e2230;
+      --border: #2a2f3e;
+      --text: #e8eaf0;
+      --muted: #7a82a0;
+      --accent: #6366f1;
+      --accent2: #818cf8;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --orange: #f97316;
+      --red: #ef4444;
+      --teal: #14b8a6;
+      --radius: 12px;
+      --font: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Top nav ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,20,0.85);
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    }
+    .logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .badge {
+      background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border);
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 20px; letter-spacing: 0.5px;
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 56px 0 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(99,102,241,0.12); color: var(--accent2);
+      border: 1px solid rgba(99,102,241,0.25);
+      font-size: 12px; font-weight: 600; padding: 4px 12px;
+      border-radius: 20px; letter-spacing: 0.5px; margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 38px; font-weight: 800; letter-spacing: -1px;
+      line-height: 1.2; margin-bottom: 12px;
+    }
+    .hero h1 span {
+      background: linear-gradient(90deg, var(--accent2), var(--teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { color: var(--muted); font-size: 16px; max-width: 560px; }
+    .hero-meta {
+      margin-top: 20px; display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .hero-meta-item {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 13px;
+    }
+    .hero-meta-item span { color: var(--text); font-weight: 600; }
+
+    /* ── Strategy summary cards ── */
+    .strategy-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      padding: 32px 0;
+    }
+    .strategy-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      cursor: pointer; transition: border-color 0.2s, transform 0.15s;
+      position: relative; overflow: hidden;
+    }
+    .strategy-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      right: 0; height: 3px; border-radius: 4px 4px 0 0;
+    }
+    .strategy-card.buy::before { background: var(--green); }
+    .strategy-card.hold::before { background: var(--yellow); }
+    .strategy-card.watch::before { background: var(--orange); }
+    .strategy-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .strategy-card .count {
+      font-size: 36px; font-weight: 800; line-height: 1;
+      margin-bottom: 4px;
+    }
+    .strategy-card.buy .count { color: var(--green); }
+    .strategy-card.hold .count { color: var(--yellow); }
+    .strategy-card.watch .count { color: var(--orange); }
+    .strategy-card .label { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .strategy-card .desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title { font-size: 16px; font-weight: 700; }
+    .section-sub { font-size: 13px; color: var(--muted); }
+
+    /* ── Tab filter ── */
+    .tabs {
+      display: flex; gap: 6px; padding: 4px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; width: fit-content; margin-bottom: 20px;
+    }
+    .tab {
+      padding: 6px 16px; font-size: 13px; font-weight: 500;
+      border-radius: 6px; cursor: pointer; border: none;
+      background: transparent; color: var(--muted);
+      transition: all 0.15s;
+    }
+    .tab.active { background: var(--surface2); color: var(--text); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* ── City table ── */
+    .city-grid {
+      display: grid; gap: 12px;
+    }
+    .city-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 120px 120px 120px 160px;
+      align-items: center; gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      transition: border-color 0.15s;
+    }
+    .city-row:hover { border-color: rgba(99,102,241,0.4); }
+
+    .city-info { display: flex; align-items: center; gap: 12px; }
+    .city-flag {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--surface2); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .city-name { font-size: 15px; font-weight: 700; }
+    .city-country { font-size: 12px; color: var(--muted); }
+
+    .metric-col { text-align: right; }
+    .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .metric-val { font-size: 15px; font-weight: 600; }
+    .metric-val.pos { color: var(--green); }
+    .metric-val.neg { color: var(--red); }
+    .metric-val.neu { color: var(--yellow); }
+    .metric-val.na { color: var(--muted); font-size: 13px; }
+
+    .price-col { }
+    .price-main { font-size: 14px; font-weight: 600; }
+    .price-unit { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Signal badge */
+    .signal {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .signal.buy { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .signal.hold { background: rgba(234,179,8,0.12); color: var(--yellow); border: 1px solid rgba(234,179,8,0.3); }
+    .signal.watch { background: rgba(249,115,22,0.12); color: var(--orange); border: 1px solid rgba(249,115,22,0.3); }
+    .signal.na { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .signal-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ── Return bar chart ── */
+    .bar-cell { display: flex; align-items: center; gap: 8px; }
+    .bar-track {
+      flex: 1; height: 6px; background: var(--surface2);
+      border-radius: 3px; overflow: hidden; min-width: 60px;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .bar-fill.pos { background: var(--green); }
+    .bar-fill.neg { background: var(--red); }
+
+    /* ── Insights section ── */
+    .insights-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-top: 32px;
+    }
+    .insight-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .insight-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px;
+    }
+    .insight-icon {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .insight-title { font-size: 14px; font-weight: 700; }
+
+    .insight-list { display: flex; flex-direction: column; gap: 10px; }
+    .insight-item {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .insight-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .insight-item-left { flex: 1; }
+    .insight-item-city { font-size: 13px; font-weight: 600; }
+    .insight-item-reason { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .insight-item-return { font-size: 14px; font-weight: 700; flex-shrink: 0; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      margin: 32px 0;
+      padding: 16px 20px;
+      background: rgba(234,179,8,0.06);
+      border: 1px solid rgba(234,179,8,0.2);
+      border-radius: var(--radius);
+      font-size: 12px; color: var(--muted); line-height: 1.7;
+    }
+    .disclaimer strong { color: var(--yellow); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0; margin-top: 40px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    footer p { font-size: 12px; color: var(--muted); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .strategy-grid { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+      .city-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .insights-grid { grid-template-columns: 1fr; }
+      nav { padding: 14px 16px; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 26px; }
+    }
+    @media (max-width: 600px) {
+      .strategy-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🌍</div>
+    Global Asset Flow
+  </div>
+  <div class="nav-links">
+    <a href="#" class="active">房产流向</a>
+    <a href="#">汇率追踪</a>
+    <a href="#">策略报告</a>
+  </div>
+  <div class="badge">DATA: 2024 Q4</div>
+</nav>
+
+<div class="container">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">🔍 个人投资者视角</div>
+    <h1>全球核心城市<br/><span>资产配置策略</span>分析</h1>
+    <p>基于当地房价涨跌 × 汇率变动，从中国投资者视角测算折算收益，给出配置信号。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">🏙️ 覆盖城市 <span>8</span></div>
+      <div class="hero-meta-item">📅 数据截至 <span>2024 Q4 / 2026-05</span></div>
+      <div class="hero-meta-item">💱 基准货币 <span>CNY（人民币）</span></div>
+      <div class="hero-meta-item">📊 有效数据 <span>7 cities</span></div>
+    </div>
+  </section>
+
+  <!-- Strategy summary -->
+  <div class="strategy-grid" id="strategyCards">
+    <div class="strategy-card buy" onclick="filterBySignal('buy')">
+      <div class="count" id="countBuy">0</div>
+      <div class="label">🟢 买入关注</div>
+      <div class="desc">折算收益大幅下跌，外资购入窗口期；或汇率叠加涨幅显著</div>
+    </div>
+    <div class="strategy-card hold" onclick="filterBySignal('hold')">
+      <div class="count" id="countHold">0</div>
+      <div class="label">🟡 观望持有</div>
+      <div class="desc">价格相对稳定，汇率影响中性，可长期持有等待趋势明朗</div>
+    </div>
+    <div class="strategy-card watch" onclick="filterBySignal('watch')">
+      <div class="count" id="countWatch">0</div>
+      <div class="label">🟠 谨慎跟踪</div>
+      <div class="desc">温和上涨但估值偏高，需关注政策风险与流动性</div>
+    </div>
+  </div>
+
+  <!-- City table -->
+  <div class="section-header">
+    <div>
+      <div class="section-title">城市详情</div>
+      <div class="section-sub">点击信号卡片筛选，或查看全部</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="filterBySignal('all', this)">全部</button>
+    <button class="tab" onclick="filterBySignal('buy', this)">买入关注</button>
+    <button class="tab" onclick="filterBySignal('hold', this)">观望持有</button>
+    <button class="tab" onclick="filterBySignal('watch', this)">谨慎跟踪</button>
+    <button class="tab" onclick="filterBySignal('na', this)">数据不足</button>
+  </div>
+
+  <div class="city-grid" id="cityGrid"></div>
+
+  <!-- Insights -->
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(34,197,94,0.12)">📈</div>
+        <div class="insight-title">折算收益 Top 3</div>
+      </div>
+      <div class="insight-list" id="topGainers"></div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(239,68,68,0.12)">📉</div>
+        <div class="insight-title">折算回撤 Top 3</div>
+      </div>
+      <div class="insight-list" id="topLosers"></div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>⚠️ 风险提示：</strong>本页面数据来源于公开统计资料，仅作研究参考，
+    不构成任何投资建议。房产交易涉及法律、税务、汇率、政策等多重风险，
+    请在专业顾问指导下做出投资决策。过去收益不代表未来表现。
+  </div>
+
+</div>
+
+<footer class="container">
+  <p>© 2026 Global Asset Flow · 数据来源：Zillow、URA、UK Land Registry、DLD、国家统计局等</p>
+  <p>更新频率：季度</p>
+</footer>
+
+<script>
+  const CITIES = [
+    {
+      city: "Tokyo", country: "Japan", flag: "🇯🇵", currency: "JPY",
+      localChange: null, fxChange: -0.9, adjReturn: null,
+      price: null, priceUnit: "—", priceSource: "暂无数据",
+      status: "na"
+    },
+    {
+      city: "Hong Kong", country: "香港", flag: "🇭🇰", currency: "HKD",
+      localChange: -6.5, fxChange: -0.06, adjReturn: -6.56,
+      price: 11500, priceUnit: "HKD/sqft",
+      priceSource: "差饷物業估價署 2024",
+      status: "buy",
+      note: "大幅下跌，外资购入窗口期"
+    },
+    {
+      city: "Shanghai", country: "中国", flag: "🇨🇳", currency: "CNY",
+      localChange: -3.5, fxChange: -0.38, adjReturn: -3.87,
+      price: 55000, priceUnit: "CNY/㎡",
+      priceSource: "国家统计局 70 城 2024",
+      status: "buy",
+      note: "小幅下跌，性价比提升"
+    },
+    {
+      city: "Singapore", country: "新加坡", flag: "🇸🇬", currency: "SGD",
+      localChange: 3.9, fxChange: -0.52, adjReturn: 3.36,
+      price: 2280, priceUnit: "SGD/sqft",
+      priceSource: "URA Q4 2024",
+      status: "hold",
+      note: "价格稳定，汇率小幅拖累"
+    },
+    {
+      city: "London", country: "英国", flag: "🇬🇧", currency: "GBP",
+      localChange: 2.1, fxChange: 1.24, adjReturn: 3.37,
+      price: 530000, priceUnit: "GBP（中位数）",
+      priceSource: "UK Land Registry 2024",
+      status: "hold",
+      note: "涨幅平稳，汇率小幅加成"
+    },
+    {
+      city: "New York", country: "美国", flag: "🇺🇸", currency: "USD",
+      localChange: 3.86, fxChange: 0.0, adjReturn: 3.86,
+      price: 727625, priceUnit: "USD（中位数）",
+      priceSource: "Zillow ZHVI 2026-05",
+      status: "hold",
+      note: "稳健上涨，美元计价稳定"
+    },
+    {
+      city: "Sydney", country: "澳大利亚", flag: "🇦🇺", currency: "AUD",
+      localChange: 4.9, fxChange: 1.72, adjReturn: 6.7,
+      price: 1400000, priceUnit: "AUD（中位数）",
+      priceSource: "CoreLogic 2024",
+      status: "watch",
+      note: "温和上涨，估值偏高"
+    },
+    {
+      city: "Dubai", country: "阿联酋", flag: "🇦🇪", currency: "AED",
+      localChange: 8.5, fxChange: 0.0, adjReturn: 8.5,
+      price: 1420, priceUnit: "AED/sqft",
+      priceSource: "DLD Annual Report 2024",
+      status: "watch",
+      note: "涨幅最高，需关注政策"
+    }
+  ];
+
+  const SIGNAL_LABEL = { buy: "买入关注", hold: "观望持有", watch: "谨慎跟踪", na: "数据不足" };
+
+  function fmt(val, digits = 2) {
+    if (val === null || val === undefined) return null;
+    const sign = val >= 0 ? "+" : "";
+    return `${sign}${val.toFixed(digits)}%`;
+  }
+
+  function getBarWidth(val, maxAbs = 10) {
+    if (val === null) return 0;
+    return Math.min(Math.abs(val) / maxAbs * 100, 100);
+  }
+
+  function renderCity(c) {
+    const ar = c.adjReturn;
+    const arFmt = fmt(ar);
+    const arClass = ar === null ? "na" : ar >= 2 ? "pos" : ar <= -2 ? "neg" : "neu";
+    const barClass = ar !== null ? (ar >= 0 ? "pos" : "neg") : "";
+    const barW = getBarWidth(ar);
+
+    return `
+      <div class="city-row" data-signal="${c.status}">
+        <div class="city-info">
+          <div class="city-flag">${c.flag}</div>
+          <div>
+            <div class="city-name">${c.city}</div>
+            <div class="city-country">${c.country} · ${c.currency}</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;min-width:140px;">
+          <div class="bar-track">
+            <div class="bar-fill ${barClass}" style="width:${barW}%"></div>
+          </div>
+          <div class="metric-val ${arClass}" style="min-width:52px;text-align:right">
+            ${arFmt || "—"}
+          </div>
+        </div>
+
+        <div class="metric-col">
+          <div class="metric-label">本地涨跌</div>
+          <div class="metric-val ${c.localChange===null ? 'na' : c.localChange>=0 ? 'pos' : 'neg'}">
+            ${c.localChange !== null ? fmt(c.localChange) : "—"}
+          </div>
+        </div>
+
+        <div class="metric-col">
+          <div class="metric-label">汇率变动</div>
+          <div class="metric-val ${c.fxChange===null ? 'na' : c.fxChange>=0 ? 'pos' : 'neg'}">
+            ${c.fxChange !== null ? fmt(c.fxChange) : "—"}
+          </div>
+        </div>
+
+        <div class="price-col">
+          <div class="price-main">${c.price ? c.price.toLocaleString() : "—"}</div>
+          <div class="price-unit">${c.priceUnit}</div>
+        </div>
+
+        <div>
+          <div class="signal ${c.status}">
+            <span class="signal-dot"></span>
+            ${SIGNAL_LABEL[c.status]}
+          </div>
+          ${c.note ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">${c.note}</div>` : ""}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAll(filter = "all") {
+    const grid = document.getElementById("cityGrid");
+    const rows = CITIES.filter(c => filter === "all" || c.status === filter);
+    grid.innerHTML = rows.map(renderCity).join("");
+  }
+
+  function updateCounts() {
+    const counts = { buy: 0, hold: 0, watch: 0 };
+    CITIES.forEach(c => { if (counts[c.status] !== undefined) counts[c.status]++; });
+    document.getElementById("countBuy").textContent = counts.buy;
+    document.getElementById("countHold").textContent = counts.hold;
+    document.getElementById("countWatch").textContent = counts.watch;
+  }
+
+  function filterBySignal(signal, btn) {
+    renderAll(signal);
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+    else {
+      const tabs = document.querySelectorAll(".tab");
+      const map = { all: 0, buy: 1, hold: 2, watch: 3, na: 4 };
+      if (map[signal] !== undefined) tabs[map[signal]]?.classList.add("active");
+    }
+  }
+
+  function renderInsights() {
+    const valid = CITIES.filter(c => c.adjReturn !== null);
+    const sorted = [...valid].sort((a,b) => b.adjReturn - a.adjReturn);
+    const top3 = sorted.slice(0, 3);
+    const bot3 = sorted.slice(-3).reverse();
+
+    function insightItem(c) {
+      const cls = c.adjReturn >= 0 ? "pos" : "neg";
+      return `<div class="insight-item">
+        <div class="insight-item-left">
+          <div class="insight-item-city">${c.flag} ${c.city}</div>
+          <div class="insight-item-reason">${c.note || c.priceSource}</div>
+        </div>
+        <div class="insight-item-return metric-val ${cls}">${fmt(c.adjReturn)}</div>
+      </div>`;
+    }
+
+    document.getElementById("topGainers").innerHTML = top3.map(insightItem).join("");
+    document.getElementById("topLosers").innerHTML = bot3.map(insightItem).join("");
+  }
+
+  // Init
+  updateCounts();
+  renderAll("all");
+  renderInsights();
+</script>
+</body>
+</html>
