@@ -1,0 +1,50 @@
+{
+  "Tokyo": {
+    "currency": "JPY",
+    "change_12m_pct": null,
+    "latest_rate_vs_usd": 161.270787,
+    "usd_cny": 6.795288
+  },
+  "Singapore": {
+    "currency": "SGD",
+    "change_12m_pct": null,
+    "latest_rate_vs_usd": 1.291388,
+    "usd_cny": 6.795288
+  },
+  "Dubai": {
+    "currency": "AED",
+    "change_12m_pct": 0.0,
+    "latest_rate_vs_usd": 3.67,
+    "usd_cny": 6.795288
+  },
+  "Sydney": {
+    "currency": "AUD",
+    "change_12m_pct": null,
+    "latest_rate_vs_usd": 1.442576,
+    "usd_cny": 6.795288
+  },
+  "London": {
+    "currency": "GBP",
+    "change_12m_pct": null,
+    "latest_rate_vs_usd": 0.749011,
+    "usd_cny": 6.795288
+  },
+  "New York": {
+    "currency": "USD",
+    "change_12m_pct": 0.0,
+    "latest_rate_vs_usd": 1.0,
+    "usd_cny": 6.795288
+  },
+  "Shanghai": {
+    "currency": "CNY",
+    "change_12m_pct": null,
+    "latest_rate_vs_usd": 6.795288,
+    "usd_cny": 6.795288
+  },
+  "Hong Kong": {
+    "currency": "HKD",
+    "change_12m_pct": null,
+    "latest_rate_vs_usd": 7.843222,
+    "usd_cny": 6.795288
+  }
+}

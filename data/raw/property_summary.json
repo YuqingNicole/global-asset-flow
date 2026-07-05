@@ -1,0 +1,59 @@
+{
+  "bis": {
+    "_error": "HTTP Error 404: Not Found"
+  },
+  "japan": {
+    "Tokyo": {
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    "Osaka": {
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    }
+  },
+  "singapore": {
+    "_skipped": "URA_ACCESS_KEY not configured"
+  },
+  "usa": {
+    "New York": {
+      "latest_zhvi": 727625.4875807377,
+      "change_12m_pct": 3.86,
+      "currency": "USD",
+      "date": "2026-05-31"
+    },
+    "Los Angeles": {
+      "latest_zhvi": 968608.4140079925,
+      "change_12m_pct": 0.79,
+      "currency": "USD",
+      "date": "2026-05-31"
+    },
+    "Chicago": {
+      "latest_zhvi": 353998.2425005846,
+      "change_12m_pct": 4.25,
+      "currency": "USD",
+      "date": "2026-05-31"
+    },
+    "Miami": {
+      "latest_zhvi": 140299.6753183578,
+      "change_12m_pct": 1.07,
+      "currency": "USD",
+      "date": "2026-05-31"
+    },
+    "San Francisco": {
+      "latest_zhvi": 1149215.3638003822,
+      "change_12m_pct": 0.06,
+      "currency": "USD",
+      "date": "2026-05-31"
+    }
+  },
+  "dubai": {
+    "_status": "pending",
+    "_note": "需要访问 https://dubailand.gov.ae/en/open-data/ 获取 API 接入方式",
+    "_manual_data": {
+      "city": "Dubai",
+      "source": "DLD Annual Report 2024",
+      "avg_price_per_sqft_aed": 1420,
+      "change_12m_pct": 8.5,
+      "currency": "AED"
+    }
+  }
+}
